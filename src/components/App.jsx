@@ -46,7 +46,7 @@ function App() {
   // eslint-disable-next-line
   useEffect(() => {
     searchImagesFunction();
-  }, [page, searchWord]);
+  }, [page, searchWord, searchImagesFunction]);
 
   return (
     <div>
