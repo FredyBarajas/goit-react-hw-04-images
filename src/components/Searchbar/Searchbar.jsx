@@ -12,7 +12,6 @@ function Searchbar({ onSubmit }) {
   const handleSubmit = event => {
     event.preventDefault();
     onSubmit(searchWord);
-    setSearchWord('');
   };
 
   return (
