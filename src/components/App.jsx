@@ -6,9 +6,8 @@ import Button from './Button/Button';
 import Loader from './Loader/Loader';
 
 function App() {
-  const [searchWord, setSearchWord] = useState('casa');
+  const [searchWord, setSearchWord] = useState('');
   const [page, setPage] = useState(1);
-  const [per_page] = useState(12);
   const [images, setImages] = useState([]);
   const [showButton, setShowButton] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -16,14 +15,14 @@ function App() {
   const searchImagesFunction = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await searchImages(page, per_page, searchWord);
+      const response = await searchImages(page, searchWord);
       console.log(response);
       if (page === 1) {
         setImages(response.data.hits);
       } else {
         setImages(prevImages => [...prevImages, ...response.data.hits]);
       }
-      setShowButton(page < Math.ceil(total / per_page));
+      setShowButton(page < Math.ceil(total / 12));
       setTimeout(() => {
         setIsLoading(false);
       }, 1000);
@@ -31,7 +30,7 @@ function App() {
       console.log(error);
       setIsLoading(false);
     }
-  }, [page, searchWord, per_page]);
+  }, [page, searchWord]);
 
   const handleSearch = newSearch => {
     setSearchWord(newSearch);
@@ -57,9 +56,13 @@ function App() {
       {isLoading ? (
         <Loader />
       ) : showButton ? (
-        <Button onClick={handleLoadMore} />
+        searchWord === '' ? (
+          <p>Enter a term</p>
+        ) : (
+          <Button onClick={handleLoadMore} />
+        )
       ) : (
-        <p>Enter a search term</p>
+        <p>You have reached the end of the images</p>
       )}
     </div>
   );
