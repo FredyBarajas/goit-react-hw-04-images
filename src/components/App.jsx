@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { searchImages, total } from 'petition';
+import { searchImages, total } from 'PixabayApi';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
