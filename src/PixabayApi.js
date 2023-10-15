@@ -2,9 +2,10 @@ import axios from 'axios';
 import Notiflix, { Notify } from 'notiflix';
 const urlBase = 'https://pixabay.com/api/';
 const key = '38213608-ad9783a4d46f018b5b60b3fea';
+const IMAGES_PER_PAGES = 12;
 let total = 0;
 
-async function searchImages(page, per_page, searchWord) {
+async function searchImages(page, searchWord) {
   try {
     const response = await axios.get(urlBase, {
       timeout: 10000,
@@ -14,14 +15,15 @@ async function searchImages(page, per_page, searchWord) {
         image_type: 'photo',
         orientation: 'horizontal',
         safesearch: true,
-        per_page: per_page,
+        per_page: IMAGES_PER_PAGES,
         page: page,
       },
     });
     const totalHits = response.data.totalHits;
 
     total = totalHits;
-    if (total > 0) {
+
+    if (total > 0 && searchWord !== '') {
       Notify.success(`Hooray! We found ${total} images.`);
       return response;
     } else {
