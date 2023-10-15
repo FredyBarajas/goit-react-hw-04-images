@@ -1,72 +1,66 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { searchImages, total } from 'PixabayApi';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
 
-export class App extends Component {
-  state = {
-    searchWord: 'casa',
-    page: 1,
-    per_page: 12,
-    total: total,
-    images: [],
-    showButton: false,
-    isLoading: false,
-  };
+// ...
 
-  searchImages = async () => {
-    this.setState({ isLoading: true });
-    let { page, per_page, searchWord } = this.state;
+function App() {
+  const [searchWord, setSearchWord] = useState('');
+  const [page, setPage] = useState(1);
+  const [images, setImages] = useState([]);
+  const [showButton, setShowButton] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const searchImagesFunction = async () => {
+    setIsLoading(true);
     try {
-      const response = await searchImages(page, per_page, searchWord);
+      const response = await searchImages(page, searchWord);
       console.log(response);
-      this.setState(prevState => ({
-        images: [...prevState.images, ...response.data.hits],
-        total: total,
-        showButton: this.state.page < Math.ceil(total / 12),
-      }));
+      if (page === 1) {
+        setImages(response.data.hits);
+      } else {
+        setImages(prevImages => [...prevImages, ...response.data.hits]);
+      }
+      setShowButton(page < Math.ceil(total / 12));
       setTimeout(() => {
-        this.setState({ isLoading: false });
+        setIsLoading(false);
       }, 1000);
     } catch (error) {
       console.log(error);
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
   };
 
-  handleSearch = newSearch => {
-    this.setState({ searchWord: newSearch, page: 1, images: [] }, () => {
-      this.searchImages();
-    });
+  const handleSearch = newSearch => {
+    setSearchWord(newSearch);
+    setPage(1);
   };
 
-  handleLoadMore = () => {
-    this.setState(
-      prevState => ({
-        page: prevState.page + 1,
-      }),
-      () => {
-        this.searchImages();
-      }
-    );
+  const handleLoadMore = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  render() {
-    const { images } = this.state;
-    return (
-      <div>
-        <Searchbar onSubmit={this.handleSearch} />
-        <ImageGallery images={images} />
-        {this.state.isLoading ? (
-          <Loader />
-        ) : (
-          this.state.showButton && <Button onClick={this.handleLoadMore} />
-        )}
-      </div>
-    );
-  }
+  // eslint-disable-next-line
+  useEffect(() => {
+    searchImagesFunction();
+  }, [page, searchWord]);
+
+  return (
+    <div>
+      <Searchbar onSubmit={handleSearch} />
+      {searchWord !== '' && <ImageGallery images={images} />}
+      {isLoading ? (
+        <Loader />
+      ) : showButton ? (
+        <Button onClick={handleLoadMore} />
+      ) : (
+        searchWord === '' && <p>Enter a search term</p>
+      )}
+    </div>
+  );
 }
 
 export default App;
