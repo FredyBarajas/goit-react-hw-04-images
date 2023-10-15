@@ -11,6 +11,7 @@ function App() {
   const [images, setImages] = useState([]);
   const [showButton, setShowButton] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const PER_PAGE = 12;
 
   const searchImagesFunction = useCallback(async () => {
     setIsLoading(true);
@@ -22,7 +23,7 @@ function App() {
       } else {
         setImages(prevImages => [...prevImages, ...response.data.hits]);
       }
-      setShowButton(page < Math.ceil(total / 12));
+      setShowButton(page < Math.ceil(total / PER_PAGE));
       setTimeout(() => {
         setIsLoading(false);
       }, 1000);
