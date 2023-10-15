@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import {
   BtnStyled,
   ContenStyled,
@@ -6,45 +6,39 @@ import {
   ModalStyled,
 } from './StyledModal';
 
-class Modal extends Component {
-  componentDidMount() {
-    document.addEventListener('keydown', this.handleKeyPress);
-    document.addEventListener('click', this.handleClickOutside);
-  }
+function Modal({ isOpen, imageUrl, onClose }) {
+  useEffect(() => {
+    const handleKeyPress = event => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
 
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.handleKeyPress);
-    document.removeEventListener('click', this.handleClickOutside);
-  }
+    const handleClickOutside = event => {
+      if (event.target.tagName !== 'IMG') {
+        onClose();
+      }
+    };
 
-  handleKeyPress = event => {
-    if (event.key === 'Escape') {
-      this.props.onClose();
-    }
-  };
+    document.addEventListener('keydown', handleKeyPress);
+    document.addEventListener('click', handleClickOutside);
 
-  handleClickOutside = event => {
-    if (event.target.tagName !== 'IMG') {
-      this.props.onClose();
-    }
-  };
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [onClose]);
 
-  render() {
-    const { isOpen, imageUrl } = this.props;
+  if (!isOpen) return null;
 
-    if (!isOpen) return null;
-
-    return (
-      <ModalStyled className="modal-overlay">
-        <ContenStyled className="modal">
-          <ImageStyled src={imageUrl} alt="Modal Image" />
-          <BtnStyled className="modal-close-btn" onClick={this.props.onClose}>
-            X
-          </BtnStyled>
-        </ContenStyled>
-      </ModalStyled>
-    );
-  }
+  return (
+    <ModalStyled>
+      <ContenStyled>
+        <ImageStyled src={imageUrl} alt="Modal Image" />
+        <BtnStyled onClick={onClose}>X</BtnStyled>
+      </ContenStyled>
+    </ModalStyled>
+  );
 }
 
 export default Modal;
